@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: todo-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test-db
+    username: test
+    password: test
+  flyway:
+    user: test
+    password: test
+  jpa:
+    open-in-view: false

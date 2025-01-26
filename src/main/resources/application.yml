@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: @artifactId@
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_SERVICE_USERNAME}
+    password: ${DATABASE_SERVICE_PASSWORD}
+  flyway:
+    user: ${DATABASE_FLYWAY_USER}
+    password: ${DATABASE_FLYWAY_PASSWORD}
+  jpa:
+    open-in-view: false
