@@ -13,7 +13,7 @@ class TodoControllerAdvice {
     @ExceptionHandler
     fun handle(exception: TodoNotFoundException): ResponseEntity<String> =
         ResponseEntity
-            .status(404)
+            .status(HttpStatus.NOT_FOUND)
             .body(exception.message)
 
     @ExceptionHandler
