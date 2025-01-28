@@ -7,6 +7,7 @@ import com.marcusvanwinden.todoservice.v1.todo.dto.response.toResponseDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.validation.Valid
 import java.util.UUID
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -30,7 +31,7 @@ class TodoController(private val todoService: TodoService) {
         ]
     )
     @PostMapping
-    fun createTodo(@RequestBody requestBody: CreateTodoRequestDto): ResponseEntity<TodoResponseDto> {
+    fun createTodo(@Valid @RequestBody requestBody: CreateTodoRequestDto): ResponseEntity<TodoResponseDto> {
         val todo = todoService.createTodo(requestBody)
 
         return ResponseEntity

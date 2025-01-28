@@ -12,7 +12,7 @@ class TodoService(private val todoRepository: TodoRepository) {
     fun createTodo(requestBody: CreateTodoRequestDto): Todo {
         val todo = todoRepository.save(
             Todo(
-                title = requestBody.title,
+                title = requestBody.title.trim(),
             )
         )
 

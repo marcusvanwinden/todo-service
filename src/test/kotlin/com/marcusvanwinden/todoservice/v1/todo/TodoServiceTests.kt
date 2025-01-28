@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.data.repository.findByIdOrNull
+import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 class TodoServiceTests {
@@ -27,11 +28,20 @@ class TodoServiceTests {
 
         @Test
         fun `should create a todo`() {
-            every { todoRepository.save(any()) } returns createTodo()
+            every { todoRepository.save(any()) } returnsArgument 0
 
             val result = todoService.createTodo(CreateTodoRequestDto(title = "Do laundry"))
 
-            assert(result.title == "Buy groceries")
+            assertEquals("Do laundry", result.title)
+        }
+
+        @Test
+        fun `should trim the title`() {
+            every { todoRepository.save(any()) } returnsArgument 0
+
+            val result = todoService.createTodo(CreateTodoRequestDto(title = "  Do laundry  "))
+
+            assertEquals("Do laundry", result.title)
         }
 
     }
@@ -48,9 +58,9 @@ class TodoServiceTests {
 
             val result = todoService.getTodos()
 
-            assert(result.size == 2)
-            assert(result[0].title == "Buy groceries")
-            assert(result[1].title == "Do laundry")
+            assertEquals(2, result.size)
+            assertEquals("Buy groceries", result[0].title)
+            assertEquals("Do laundry", result[1].title)
         }
 
     }
@@ -69,7 +79,7 @@ class TodoServiceTests {
                 UpdateTodoRequestDto(completed = true)
             )
 
-            assert(result.completed)
+            assertEquals(true, result.completed)
         }
 
         @Test

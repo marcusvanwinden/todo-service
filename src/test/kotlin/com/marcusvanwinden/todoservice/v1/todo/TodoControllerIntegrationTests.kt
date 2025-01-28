@@ -7,10 +7,13 @@ import io.github.cdimascio.dotenv.Dotenv
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -56,20 +59,31 @@ class TodoControllerIntegrationTests {
 
         @Test
         fun `should respond with the newly created todo and status 201`() {
-            val response = given()
+            given()
                 .port(port)
                 .contentType(ContentType.JSON)
                 .body(CreateTodoRequestDto(title = "Buy groceries"))
                 .post("/v1/todos")
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .body()
-                .`as`(TodoResponseDto::class.java)
+                .extract().body().`as`(TodoResponseDto::class.java)
+                .also { assertThat(it)
+                    .isInstanceOf(TodoResponseDto::class.java)
+                    .hasFieldOrPropertyWithValue("title", "Buy groceries")
+                }
+        }
 
-            assertThat(response)
-                .isInstanceOf(TodoResponseDto::class.java)
-                .hasFieldOrPropertyWithValue("title", "Buy groceries")
+        @ParameterizedTest
+        @ValueSource(strings = ["", " ", "\t", "\n", "     \n     "])
+        fun `should respond with status 400 when title is empty`(invalidTitle: String) {
+            given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(CreateTodoRequestDto(invalidTitle))
+                .post("/v1/todos")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(equalTo("Title cannot be blank"))
         }
 
     }
@@ -79,18 +93,16 @@ class TodoControllerIntegrationTests {
 
         @Test
         fun `should respond with a list and status 200`() {
-            val response = given()
+            given()
                 .port(port)
                 .get("/v1/todos")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .extract()
-                .body()
-                .`as`(Array<TodoResponseDto>::class.java)
-
-            assertThat(response)
-                .isNotEmpty
-                .allSatisfy { todo -> assertThat(todo).isInstanceOf(TodoResponseDto::class.java) }
+                .extract().body().`as`(Array<TodoResponseDto>::class.java)
+                .also { assertThat(it)
+                    .isNotEmpty
+                    .allSatisfy { todo -> assertThat(todo).isInstanceOf(TodoResponseDto::class.java) }
+                }
         }
 
     }
@@ -100,20 +112,18 @@ class TodoControllerIntegrationTests {
 
         @Test
         fun `should respond with the updated todo and status 200`() {
-            val response = given()
+            given()
                 .port(port)
                 .contentType(ContentType.JSON)
                 .body(UpdateTodoRequestDto(title = "Updated todo"))
                 .patch("/v1/todos/${initialTodo.id}")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .extract()
-                .body()
-                .`as`(TodoResponseDto::class.java)
-
-            assertThat(response)
-                .isInstanceOf(TodoResponseDto::class.java)
-                .hasFieldOrPropertyWithValue("title", "Updated todo")
+                .extract().body().`as`(TodoResponseDto::class.java)
+                .also { assertThat(it)
+                    .isInstanceOf(TodoResponseDto::class.java)
+                    .hasFieldOrPropertyWithValue("title", "Updated todo")
+                }
         }
 
     }
