@@ -7,10 +7,10 @@ import io.github.cdimascio.dotenv.Dotenv
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.hamcrest.CoreMatchers.equalTo
+import org.junit.jupiter.api.*
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -70,6 +70,19 @@ class TodoControllerIntegrationTests {
             assertThat(response)
                 .isInstanceOf(TodoResponseDto::class.java)
                 .hasFieldOrPropertyWithValue("title", "Buy groceries")
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = ["", " ", "\t", "\n", "     \n     "])
+        fun `should respond with status 400 when title is empty`(invalidTitle: String) {
+            given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(CreateTodoRequestDto(invalidTitle))
+                .post("/v1/todos")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(equalTo("Title cannot be blank"))
         }
 
     }
