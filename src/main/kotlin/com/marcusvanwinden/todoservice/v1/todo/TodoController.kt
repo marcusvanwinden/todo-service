@@ -4,6 +4,9 @@ import com.marcusvanwinden.todoservice.v1.todo.dto.request.CreateTodoRequestDto
 import com.marcusvanwinden.todoservice.v1.todo.dto.request.UpdateTodoRequestDto
 import com.marcusvanwinden.todoservice.v1.todo.dto.response.TodoResponseDto
 import com.marcusvanwinden.todoservice.v1.todo.dto.response.toResponseDto
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import java.util.UUID
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,6 +23,12 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/todos")
 class TodoController(private val todoService: TodoService) {
 
+    @Operation(
+        summary = "Create a new todo",
+        responses = [
+            ApiResponse(responseCode = "201")
+        ]
+    )
     @PostMapping
     fun createTodo(@RequestBody requestBody: CreateTodoRequestDto): ResponseEntity<TodoResponseDto> {
         val todo = todoService.createTodo(requestBody)
@@ -29,6 +38,12 @@ class TodoController(private val todoService: TodoService) {
             .body(todo.toResponseDto())
     }
 
+    @Operation(
+        summary = "Get all todos",
+        responses = [
+            ApiResponse(responseCode = "200")
+        ]
+    )
     @GetMapping
     fun getTodos(): ResponseEntity<List<TodoResponseDto>> {
         val todos = todoService.getTodos()
@@ -38,6 +53,13 @@ class TodoController(private val todoService: TodoService) {
             .body(todos.map { it.toResponseDto() })
     }
 
+    @Operation(
+        summary = "Update a todo by id",
+        responses = [
+            ApiResponse(responseCode = "200"),
+            ApiResponse(responseCode = "404", content = [Content()])
+        ]
+    )
     @PatchMapping("/{id}")
     fun updateTodo(
         @PathVariable id: UUID,
@@ -50,6 +72,12 @@ class TodoController(private val todoService: TodoService) {
             .body(updatedTodo.toResponseDto())
     }
 
+    @Operation(
+        summary = "Delete a todo by id",
+        responses = [
+            ApiResponse(responseCode = "204")
+        ]
+    )
     @DeleteMapping("/{id}")
     fun deleteTodo(@PathVariable id: UUID): ResponseEntity<Unit> {
         todoService.deleteTodo(id)

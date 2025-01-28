@@ -10,3 +10,6 @@ spring:
     password: ${DATABASE_FLYWAY_PASSWORD}
   jpa:
     open-in-view: false
+springdoc:
+  swagger-ui:
+    default-models-expand-depth: -1

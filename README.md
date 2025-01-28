@@ -44,5 +44,5 @@ ALTER DEFAULT PRIVILEGES
 ```
 ./mvnw spring-boot:run
 ```
-7. The application will be accessible at `http://localhost:8080/v1/todos`.
+7. The application will be accessible at `http://localhost:8080/swagger-ui/index.html`.
 8. To stop the database and application, hit ```Ctrl + C``` in the terminal windows.
