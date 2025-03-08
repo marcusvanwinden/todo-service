@@ -1,12 +1,4 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Build application
+name: Build
 
 on:
   push:
@@ -15,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-jar:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -30,3 +22,32 @@ jobs:
       env:
         POSTGRES_DOCKER_IMAGE: ${{ vars.POSTGRES_DOCKER_IMAGE }}
       run: mvn -B package --file pom.xml
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-build
+        path: target/*.jar
+        retention-days: 1
+
+  build-and-push-image:
+    needs: build-jar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: Dockerfile
+          sparse-checkout-cone-mode: false
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-build
+          path: target
+      - name: Build and push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: marcusvanwinden/todo-service
+          tags: latest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
