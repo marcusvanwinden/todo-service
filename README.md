@@ -15,14 +15,7 @@ create, read, update, and delete tasks.
 ### 2.2 Running the application
 
 1. Clone the repository.
-2. Populate the .env file with the following variables:
-    - POSTGRES_DOCKER_IMAGE
-    - POSTGRES_PASSWORD
-    - DATABASE_URL
-    - DATABASE_SERVICE_USERNAME
-    - DATABASE_SERVICE_PASSWORD
-    - DATABASE_FLYWAY_USER
-    - DATABASE_FLYWAY_PASSWORD
+2. Create a `.env` file in the project's root directory and set the required environment variables (see `.env.example`).
 3. Run the following command in the project's terminal to start the database:
 ```
 docker compose up

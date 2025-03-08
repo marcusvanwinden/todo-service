@@ -37,9 +37,9 @@ class TodoControllerIntegrationTests {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            val dotenv = Dotenv.configure().load()
-
-            PostgreSQLContainer(dotenv["POSTGRES_DOCKER_IMAGE"]).apply {
+            PostgreSQLContainer(
+                System.getenv("POSTGRES_DOCKER_IMAGE") ?: Dotenv.configure().ignoreIfMissing().load()["POSTGRES_DOCKER_IMAGE"]
+            ).apply {
                 withDatabaseName("test")
                 withUsername("test")
                 withPassword("test")
